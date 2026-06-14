@@ -1,4 +1,5 @@
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
+const path = require('path')
 
 /**
  * Metro configuration
@@ -9,9 +10,16 @@ const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config')
 const config = {
   resolver: {
     extraNodeModules: {
-      // crypto: require.resolve('react-native-quick-crypto'),
-      // stream: require.resolve('stream-browserify'),
       buffer: require.resolve('@craftzdog/react-native-buffer'),
+    },
+    resolveRequest: (context, realModuleName, platform) => {
+      if (realModuleName.startsWith('@/')) {
+        return {
+          filePath: path.resolve(__dirname, 'src', realModuleName.slice(2)),
+          type: 'sourceFile',
+        }
+      }
+      return context.resolveRequest(context, realModuleName, platform)
     },
   },
 }
